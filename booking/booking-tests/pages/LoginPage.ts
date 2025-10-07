@@ -71,4 +71,33 @@ export class LoginPage {
 
    
   }
+
+  // Đăng nhập với credential tùy ý (dùng cho negative tests)
+  async loginWith(email: string, password: string) {
+    await this.openLoginForm();
+    const emailInput = this.page.locator('.ant-modal-content input[name="email"]');
+    const passwordInput = this.page.locator('.ant-modal-content input[name="password"]');
+    await emailInput.fill(email);
+    await passwordInput.fill(password);
+    await this.clickLogin();
+  }
+
+  // Lấy danh sách thông báo lỗi hiển thị (validation hoặc toast)
+  async getErrorMessages() {
+    const potentialErrors = [
+      this.page.locator('text=Sai thông tin đăng nhập'),
+      this.page.locator('text=Email is required'),
+      this.page.locator('text=Password is required'),
+      this.page.locator('.ant-message-error'),
+      this.page.locator('.ant-form-item-explain-error')
+    ];
+    const visible: string[] = [];
+    for (const loc of potentialErrors) {
+      if (await loc.first().isVisible()) {
+        const texts = await loc.allInnerTexts();
+        visible.push(...texts);
+      }
+    }
+    return visible;
+  }
 }
