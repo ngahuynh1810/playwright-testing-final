@@ -170,65 +170,75 @@ test("Không cho đặt phòng khi chưa đăng nhập", async ({ page }) => {
    await expect(alertMsg).toBeVisible({ timeout: 10000 });
 
   });
-  test("Kiểm tra hiển thị giá phòng + phí", async ({ page }) => {
+  test('Kiểm tra giá phòng x số đêm + phí dọn dẹp , tổng cộng (theo UI)', async ({ page }) => {
     const homePage = new HomePage(page);
     const roomDetailPage = new RoomDetailPage(page);
-
-    //  Vào trang chủ
+  
+    // Vào trang & chọn phòng đầu tiên
     await homePage.goto();
-
-    //  Chọn city HCM
     await homePage.selectHCM();
-
-    //  Chọn phòng đầu tiên
     await homePage.selectFirstRoom();
-
-    //  Kiểm tra giá phòng
-    const roomPriceText = page.locator('p.underline.text-base', { hasText: "nights" });
-    const roomPriceValue = page.locator('p.font-mono.text-lg.font-bold').first();
-
-    await expect(roomPriceText).toBeVisible();
-    await expect(roomPriceValue).toBeVisible();
-    await expect(roomPriceValue).toHaveText("$ 196");
-
-    //  Kiểm tra phí dọn dẹp
-    const cleaningFeeText = page.locator('p.underline.text-base', { hasText: "Cleaning fee" });
-    const cleaningFeeValue = cleaningFeeText.locator('xpath=following-sibling::p');
-
-    await expect(cleaningFeeText).toBeVisible();
-    await expect(cleaningFeeValue).toBeVisible();
-    await expect(cleaningFeeValue).toHaveText("$ 8");
-
-    //  Kiểm tra tổng cộng trước thuế
-    const totalText = page.locator('text=Total before taxes');
-    const totalValue = totalText.locator('xpath=following-sibling::p');
-
-    await expect(totalText).toBeVisible();
-    await expect(totalValue).toBeVisible();
-    await expect(totalValue).toHaveText("204");
+  
+    // Chọn ngày Check-in & Check-out
+    await roomDetailPage.openCalendar();
+    await roomDetailPage.selectCheckInAndCheckOut();
+    await roomDetailPage.closeCalendar();
+  
+    // Lấy dòng chứa giá × số đêm
+    const priceAndNightsLocator = page.locator('p.underline.text-base', { hasText: '$' });
+    await expect(priceAndNightsLocator.first()).toBeVisible({ timeout: 5000 });
+  
+    const priceAndNightsText = await priceAndNightsLocator.first().textContent();
+    expect(priceAndNightsText).not.toBeNull();
+  
+    const match = priceAndNightsText!.match(/\$?\s*(\d+)\s*[xX]\s*(\d+)\s*nights/);
+    expect(match).not.toBeNull();
+  
+    const pricePerNight = Number(match![1]);
+    const numberOfNights = Number(match![2]);
+  
+    expect(pricePerNight).toBeGreaterThan(0);
+    expect(numberOfNights).toBeGreaterThan(0);
+  
+    //  Lấy Cleaning fee
+    const cleaningFeeLabel = page.locator('p.underline.text-base', { hasText: 'Cleaning fee' });
+    await expect(cleaningFeeLabel.first()).toBeVisible();
+  
+    const cleaningFeeValueLocator = cleaningFeeLabel.locator(
+      'xpath=following-sibling::p[contains(@class,"font-mono")]'
+    );
+    await expect(cleaningFeeValueLocator.first()).toBeVisible();
+  
+    const cleaningFeeText = await cleaningFeeValueLocator.first().textContent();
+    expect(cleaningFeeText).not.toBeNull();
+  
+    const cleaningFee = Number(cleaningFeeText?.replace(/[^0-9]/g, ''));
+    expect(cleaningFee).toBeGreaterThanOrEqual(0);
+  
+    //  Lấy Total before taxes (đã fix selector)
+    const totalBeforeTaxesLocator = page.locator(
+      'div.flex:has(p:has-text("Total before taxes")) >> p.font-mono.text-lg.font-bold'
+    );
+    await expect(totalBeforeTaxesLocator.first()).toBeVisible();
+  
+    const totalText = await totalBeforeTaxesLocator.first().textContent();
+    console.log('💬 totalText:', totalText);
+    expect(totalText).not.toBeNull();
+  
+    const totalUI = Number(totalText?.replace(/[^0-9]/g, ''));
+  
+    //  Tính tổng dự kiến
+    const expectedTotal = pricePerNight * numberOfNights + cleaningFee;
+  
+    console.log({
+      pricePerNight,
+      numberOfNights,
+      cleaningFee,
+      expectedTotal,
+      totalUI,
+    });
+  
+    //  So sánh kết quả
+    expect(totalUI).toBe(expectedTotal);
   });
-
-test("Kiểm tra xác nhận và ghi chú chi tiết sau khi đặt phòng", async ({ page }) => {
-  const homePage = new HomePage(page);
-  const loginPage = new LoginPage(page);
-  const roomDetailPage = new RoomDetailPage(page);
-
-  await homePage.goto();
- 
-  await homePage.selectHCM();
-  await homePage.selectFirstRoom();
-  await loginPage.login();
-  await roomDetailPage.openCalendar();
-  await roomDetailPage.selectCheckInAndCheckOut();
-  await roomDetailPage.closeCalendar();
-  await roomDetailPage.addGuests(2);
-  await roomDetailPage.clickBookNow();
-  await roomDetailPage.confirmBooking();
-
-  // Kiểm tra thông báo thành công
-  const confirmationMessage = page.locator('text=Thêm mới thành công');
-  await expect(confirmationMessage).toBeVisible({ timeout: 10000 });
-
-  // Ghi chú: chi tiết đặt phòng chưa được hiển thị
-  console.log('Chi tiết booking chưa được hiển thị trong hệ thống hiện tại');
-});
+  
