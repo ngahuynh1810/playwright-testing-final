@@ -1,13 +1,7 @@
 {
-<<<<<<< HEAD
   "name": "playwright-testing-final",
   "version": "1.0.0",
   "description": "Final project for end-to-end automated testing using Playwright, demonstrating test scenarios, execution, and reporting",
-=======
-  "name": "booking-tests",
-  "version": "1.0.0",
-  "description": "",
->>>>>>> booking
   "main": "index.js",
   "scripts": {},
   "keywords": [],
