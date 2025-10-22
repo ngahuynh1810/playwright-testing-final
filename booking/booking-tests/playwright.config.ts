@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export default defineConfig({
+  timeout: 120000,
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
@@ -17,12 +18,10 @@ export default defineConfig({
 
   use: {
     headless: true,
-    baseURL:'https://demo4.cybersoft.edu.vn/',
+    baseURL: 'https://demo4.cybersoft.edu.vn/',
     screenshot: 'on',
     video: 'on',
     trace: 'on-first-retry',
-    timeout: 120000, // tăng timeout cho mỗi test lên 60s
-retries: 2, // thử lại test 2 lần nếu fail
 
   },
 

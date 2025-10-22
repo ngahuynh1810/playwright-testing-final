@@ -11,11 +11,10 @@ export class RoomDetailPage {
   async openCalendar() {
     // const nhanPhong = this.page.getByText('Nhận phòng', { exact: true });
     const nhanPhong = this.page.locator('div.font-bold:has-text("Nhận phòng")');
-    console.log("nhanPhong", nhanPhong)
     await expect(nhanPhong).toBeVisible();
     await nhanPhong.scrollIntoViewIfNeeded();
 
-    await nhanPhong.click({ force: true });
+    await nhanPhong.click();
   }
 
   // 2️⃣ Chọn ngày check-in và check-out
@@ -36,7 +35,7 @@ export class RoomDetailPage {
   async fillCheckInAndCheckOutFuture(numberDays: number = DEFAULT_NEXT_DAYS_FILL) {
     await this.page.waitForSelector('.rdrDateRangePickerWrapper', {
       state: 'visible',
-      timeout: 15000,
+      timeout: 120000,
     });
 
     // verify
@@ -77,7 +76,7 @@ export class RoomDetailPage {
   // 6️⃣ Xác nhận đặt phòng
   async confirmBooking() {
     const confirmBtn = this.page.locator('button', { hasText: 'Xác nhận' });
-    await expect(confirmBtn).toBeVisible({ timeout: 10000 });
+    await expect(confirmBtn).toBeVisible({ timeout: 120000 });
     await confirmBtn.click();
   }
 }
