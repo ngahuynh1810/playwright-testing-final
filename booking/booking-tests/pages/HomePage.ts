@@ -27,12 +27,11 @@ export class HomePage {
     // await firstroom.waitFor({ state: 'visible', timeout: 30000 });
     // await firstroom.scrollIntoViewIfNeeded();
     // await firstroom.click();
-    const roomLink = this.page.locator('a[href="/room-detail/1"]');
-    await roomLink.waitFor({ state: 'visible', timeout: 30000 });
-    await roomLink.scrollIntoViewIfNeeded();
-    await expect(roomLink).toBeVisible();
-    await roomLink.click();
-
+    const roomLink = this.page.locator('a[href^="/room-detail/"]');
+    await roomLink.first().waitFor({ state: 'visible', timeout: 60000 });
+    await roomLink.first().scrollIntoViewIfNeeded();
+    await expect(roomLink.first()).toBeVisible();
+    await roomLink.first().click();
     // Chờ trang chi tiết hiển thị 
     const bookBtn = this.page.getByRole("button", { name: "Đặt phòng" });
     await expect(bookBtn).toBeVisible({ timeout: 30000 });

@@ -2,8 +2,9 @@ import { test, expect } from "@playwright/test";
 import { LoginPage } from "../pages/LoginPage";
 import { HomePage } from "../pages/HomePage";
 import { RoomDetailPage } from "../pages/RoomDetailPage";
+import { ReviewPage } from '../pages/ReviewPage';
 
-test("đặt phòng thành công với ngày tháng hợp lệ", async ({ page }) => {
+test("Đặt phòng thành công với ngày tháng hợp lệ", async ({ page }) => {
   //  Vào trang chủ và chọn city Hồ Chí Minh
   const home = new HomePage(page);
   const room = new RoomDetailPage(page);
@@ -15,8 +16,7 @@ test("đặt phòng thành công với ngày tháng hợp lệ", async ({ page }
   //  Login (từ trang chi tiết)
   const login = new LoginPage(page);
   await login.login();
-  
-  //  Chọn ngày nhận/trả phòng 29-30/10/2025
+
   // const room = new RoomDetailPage(page);
   await room.openCalendar();
   await room.fillCheckInAndCheckOutFuture();
@@ -34,6 +34,7 @@ test("đặt phòng thành công với ngày tháng hợp lệ", async ({ page }
   //  Kiểm tra thông báo thành công (nếu có)
   const successMessage = page.locator("text=Thêm mới thành công");
   await expect(successMessage).toBeVisible({ timeout: 10000 });
+  console.log('✅ Test passed: Đặt phòng thành công với ngày tháng hợp lệ');
 });
 
 test("Kiểm tra số khách tối đa cho phép", async ({ page }) => {
@@ -77,10 +78,11 @@ test("Kiểm tra số khách tối đa cho phép", async ({ page }) => {
   //  Kiểm tra thông báo hiển thị
   const successMessage = page.getByText("Đã đạt tới số khách tối đa!").first();
   await expect(successMessage).toBeVisible({ timeout: 5000 });
+  console.log('✅ Test passed: Kiểm tra số khách tối đa cho phép');
 
 });
 
-test(" đặt phòng thành công với số lượng khách hợp lệ", async ({ page }) => {
+test("Đặt phòng thành công với số lượng khách hợp lệ", async ({ page }) => {
   //  Vào trang chủ và chọn city (ví dụ HCM)
   const home = new HomePage(page);
   await home.goto();
@@ -111,6 +113,7 @@ test(" đặt phòng thành công với số lượng khách hợp lệ", async 
   //  Kiểm tra thông báo thành công
   const successMessage = page.locator("text=Thêm mới thành công");
   await expect(successMessage).toBeVisible({ timeout: 10000 });
+  console.log('✅ Test passed: Đặt phòng thành công với số lượng khách hợp lệ');
 });
 test("Booking flow: không cho chọn ngày nhận phòng trong quá khứ", async ({ page }) => {
   const homePage = new HomePage(page);
@@ -136,6 +139,7 @@ test("Booking flow: không cho chọn ngày nhận phòng trong quá khứ", asy
 
   //  Đóng calendar
   await roomDetailPage.closeCalendar();
+  console.log('✅ Test passed: Booking flow: không cho chọn ngày nhận phòng trong quá khứ');
 });
 
 test("Không cho đặt phòng khi chưa đăng nhập", async ({ page }) => {
@@ -165,6 +169,7 @@ test("Không cho đặt phòng khi chưa đăng nhập", async ({ page }) => {
   //  Kiểm tra thông báo lỗi yêu cầu đăng nhập
   const alertMsg = page.locator("text=Vui lòng đăng nhập để tiếp tục đặt phòng.");
   await expect(alertMsg).toBeVisible({ timeout: 10000 });
+  console.log('✅ Test passed: Không cho đặt phòng khi chưa đăng nhập');
 
 });
 test('Kiểm tra giá phòng x số đêm + phí dọn dẹp , tổng cộng (theo UI) Updated', async ({ page }) => {
@@ -239,6 +244,52 @@ test('Kiểm tra giá phòng x số đêm + phí dọn dẹp , tổng cộng (th
   expect(displayedTotal).toBe(expectedTotal);
 
   console.log(`SUCCESS: Displayed total (${displayedTotal}) matches calculated total (${expectedTotal}).`);
+  console.log('✅ Test passed: Kiểm tra giá phòng x số đêm + phí dọn dẹp , tổng cộng (theo UI)');
+});
+test("Xem lịch sử sau khi đặt phòng thành công ", async ({ page }) => {
+  //  Vào trang chủ và chọn city Hồ Chí Minh
+  const home = new HomePage(page);
+  const room = new RoomDetailPage(page);
+  await home.goto();
+  await home.selectHCM();
+
+  //  Chọn phòng đầu tiên → vào trang chi tiết
+  await home.selectFirstRoom();
+
+  // verify login thành công
+  const login = new LoginPage(page);
+  await login.login();
+  const successMsg = page.getByText("Đăng nhập thành công", { exact: true });
+  await expect(successMsg).toBeVisible({ timeout: 10000 });
+
+
+  await room.openCalendar();
+  await room.fillCheckInAndCheckOutFuture();
+  await room.closeCalendar();
+
+  //  Thêm 1 khách (mặc định 1 khách đã có sẵn)
+  await room.addGuests(1); // click 1 lần = tổng 2 khách
+
+  //  Click Đặt phòng
+  await room.clickBookNow();
+  const roomTitle = await page.locator('h2.font-bold.text-3xl.pt-4').textContent();
+  console.log('Room title in detail page:', roomTitle);
+  //  Xác nhận đặt phòng
+  await room.confirmBooking();
+
+  //  Kiểm tra thông báo thành công (nếu có)
+  const successMessage = page.locator("text=Thêm mới thành công");
+  await expect(successMessage).toBeVisible({ timeout: 10000 });
+
+  const reviewPage = new ReviewPage(page);
+  await reviewPage.openDashboard();
+  const firstRoomBlock = page.locator('a[href^="/room-detail/"]').first();
+
+  const roomTitleHistory = (await firstRoomBlock.locator('p.truncate.text-xl').innerText()).trim();
+
+  console.log('Room title in history dashboard page:', roomTitleHistory);
+  expect(roomTitleHistory).toBe(roomTitle?.trim());
+  console.log('✅ Test passed: Xem lịch sử sau khi đặt phòng thành công');
 });
 // test('Kiểm tra giá phòng x số đêm + phí dọn dẹp , tổng cộng (theo UI)', async ({ page }) => {
 //   const homePage = new HomePage(page);
