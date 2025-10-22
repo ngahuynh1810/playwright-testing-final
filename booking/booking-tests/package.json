@@ -15,12 +15,17 @@
     "report": "playwright show-report",
     "codegen": "playwright codegen https://demo4.cybersoft.edu.vn/"
   },
-  "keywords": ["playwright", "e2e", "booking", "testing"],
+  "keywords": [
+    "playwright",
+    "e2e",
+    "booking",
+    "testing"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.55.0",
-    "@types/node": "^24.3.3",
+    "@types/node": "^24.7.2",
     "dotenv": "^17.2.2"
   }
 }
