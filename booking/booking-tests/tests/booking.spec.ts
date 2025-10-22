@@ -16,7 +16,8 @@ test("Đặt phòng thành công với ngày tháng hợp lệ", async ({ page }
   //  Login (từ trang chi tiết)
   const login = new LoginPage(page);
   await login.login();
-
+  const successMsg = page.getByText("Đăng nhập thành công", { exact: true });
+  await expect(successMsg).toBeVisible({ timeout: 10000 });
   // const room = new RoomDetailPage(page);
   await room.openCalendar();
   await room.fillCheckInAndCheckOutFuture();
@@ -94,7 +95,8 @@ test("Đặt phòng thành công với số lượng khách hợp lệ", async (
   //  Login (từ trang chi tiết)
   const login = new LoginPage(page);
   await login.login();
-
+  const successMsg = page.getByText("Đăng nhập thành công", { exact: true });
+  await expect(successMsg).toBeVisible({ timeout: 10000 });
   //  Chọn ngày nhận/trả phòng 29-30/10/2025
   const room = new RoomDetailPage(page);
   await room.openCalendar();
