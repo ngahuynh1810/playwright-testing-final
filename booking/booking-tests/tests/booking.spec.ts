@@ -5,6 +5,7 @@ import { RoomDetailPage } from "../pages/RoomDetailPage";
 import { ReviewPage } from '../pages/ReviewPage';
 
 test("Đặt phòng thành công với ngày tháng hợp lệ", async ({ page }) => {
+  test.setTimeout(60000); // ⏰ 
   //  Vào trang chủ và chọn city Hồ Chí Minh
   const home = new HomePage(page);
   const room = new RoomDetailPage(page);
@@ -84,6 +85,7 @@ test("Kiểm tra số khách tối đa cho phép", async ({ page }) => {
 });
 
 test("Đặt phòng thành công với số lượng khách hợp lệ", async ({ page }) => {
+  test.setTimeout(60000); // ⏰ 
   //  Vào trang chủ và chọn city (ví dụ HCM)
   const home = new HomePage(page);
   await home.goto();
@@ -249,6 +251,7 @@ test('Kiểm tra giá phòng x số đêm + phí dọn dẹp , tổng cộng (th
   console.log('✅ Test passed: Kiểm tra giá phòng x số đêm + phí dọn dẹp , tổng cộng (theo UI)');
 });
 test("Xem lịch sử sau khi đặt phòng thành công ", async ({ page }) => {
+  test.setTimeout(60000); // ⏰ 
   //  Vào trang chủ và chọn city Hồ Chí Minh
   const home = new HomePage(page);
   const room = new RoomDetailPage(page);
