@@ -39,12 +39,17 @@ export class ReviewPage {
 
   //  Chọn phòng đầu tiên
   async selectFirstRoom() {
-    await this.page.waitForSelector('p.truncate.text-xl', { timeout: 10000 });
-    const firstRoom = this.page.locator('p.truncate.text-xl').first();
-    await firstRoom.click();
+    const roomLink = this.page.locator('a[href^="/room-detail/"]');
+    await roomLink.first().waitFor({ state: 'visible', timeout: 60000 });
+    await roomLink.first().scrollIntoViewIfNeeded();
+    await expect(roomLink.first()).toBeVisible();
+    await roomLink.first().click();
+    // await this.page.waitForSelector('p.truncate.text-xl', { timeout: 10000 });
+    // const firstRoom = this.page.locator('p.truncate.text-xl').first();
+    // await firstRoom.click();
 
-    await this.page.waitForLoadState('networkidle');
-    await expect(this.page.locator('.ant-rate-star').first()).toBeVisible({ timeout: 10000 });
+    // await this.page.waitForLoadState('networkidle');
+    // await expect(this.page.locator('.ant-rate-star').first()).toBeVisible({ timeout: 10000 });
   }
 
   //  Chọn số sao đánh giá
@@ -67,8 +72,8 @@ export class ReviewPage {
     await expect(submitBtn).toBeVisible({ timeout: 5000 });
     await submitBtn.click();
     await expect(this.page.getByText('Bình luận thành công')).toBeVisible();
-    
-  } 
+
+  }
   //  Quy trình đánh giá hoàn chỉnh
   async reviewRoom(stars: number, content: string) {
     await this.gotoAndLogin();

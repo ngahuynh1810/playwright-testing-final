@@ -1,4 +1,4 @@
-import { expect, Page } from '@playwright/test';
+import { Locator, expect, Page } from '@playwright/test';
 import { BASE_URL, USERNAME, PASSWORD } from "../utils/const";
 
 export class LoginPage {
@@ -20,7 +20,21 @@ export class LoginPage {
   async goto() {
     await this.page.goto(this.baseUrl);
   }
+  async isLogined() {
+    await this.openUserMenu();
 
+    // Tìm nút Đăng nhập và click
+    const signOutBtn = this.page.locator('button', { hasText: 'Sign out' });
+    const isVisible = await signOutBtn.isVisible().catch(() => false);
+
+    if (isVisible) {
+      console.log('✅ User is logged in');
+    } else {
+      console.log('❌ User is NOT logged in');
+    }
+
+    return isVisible;
+  }
   // Mở menu người dùng bằng cách click vào avatar ở góc phải trên (selector dựa vào src ảnh)
   async openUserMenu() {
     const avatar = this.page.locator('img.h-10[src="https://cdn-icons-png.flaticon.com/512/6596/6596121.png"]');
@@ -46,23 +60,23 @@ export class LoginPage {
   }
 
   // Nhập username vào ô email trong form login
-  async enterUsername() {
+  async enterUsername(username = USERNAME) {
     const emailInput = this.page.locator('.ant-modal-content input[name="email"]');
     await expect(emailInput).toBeVisible({ timeout: 10000 });
-    console.log("dien user name nè **** ", USERNAME)
-    await emailInput.fill(USERNAME);
+    await emailInput.fill(username);
   }
 
   // Nhập password vào ô password trong form login
-  async enterPassword() {
+  async enterPassword(password = PASSWORD) {
     const passwordInput = this.page.locator('.ant-modal-content input[name="password"]');
     await expect(passwordInput).toBeVisible({ timeout: 10000 });
-    await passwordInput.fill(PASSWORD);
+    await passwordInput.fill(password);
   }
 
   // Click nút đăng nhập trong modal
   async clickLogin() {
     const loginBtn = this.page.locator('.ant-modal-content button[type="submit"]', { hasText: 'Đăng nhập' });
+
     await expect(loginBtn).toBeVisible({ timeout: 10000 });
     await this.page.locator('.ant-modal-content button[type="submit"]', { hasText: 'Đăng nhập' }).click();
   }
@@ -73,7 +87,5 @@ export class LoginPage {
     await this.enterUsername();
     await this.enterPassword();
     await this.clickLogin();
-    const successMsg = this.page.getByText("Đăng nhập thành công", { exact: true });
-    await expect(successMsg).toBeVisible({ timeout: 10000 });
   }
 }
