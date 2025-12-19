@@ -1,4 +1,5 @@
 import { expect, Page } from "@playwright/test";
+import { BASE_URL } from "../utils/const"
 
 export class HomePage {
   readonly page: Page;
@@ -9,7 +10,7 @@ export class HomePage {
 
   // Vào trang chủ
   async goto() {
-    await this.page.goto("https://demo4.cybersoft.edu.vn/");
+    await this.page.goto(BASE_URL);
   }
 
   // Chọn city HCM	

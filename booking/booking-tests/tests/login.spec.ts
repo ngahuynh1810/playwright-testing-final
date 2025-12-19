@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
+import { BASE_URL } from "../utils/const"
 
 // Declare process for TypeScript
-// declare const process: any;
+declare const process: any;
 
-test.describe('Login flow demo4.cybersoft', () => {
+test.describe('Login flow demo5.cybersoft', () => {
   test('Đăng nhập thành công với thông tin từ .env', async ({ page }) => {
     const loginPage = new LoginPage(page);
 
@@ -18,20 +19,20 @@ test.describe('Login flow demo4.cybersoft', () => {
     await expect(successMsg).toBeVisible({ timeout: 10000 });
     console.log('✅ Test passed: Đăng nhập thành công với thông tin từ .env');
 
-    test('Đăng nhập thành công hiển thị avatar + không còn nút Đăng nhập', async ({ page }) => {
-      const loginPage = new LoginPage(page);
-      await loginPage.goto();
-      await loginPage.login();
+  });
+  test('Đăng nhập thành công hiển thị avatar + không còn nút Đăng nhập', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login();
 
-      // Kiểm tra avatar hiển thị
-      const avatar = page.locator('img.h-10[src="https://cdn-icons-png.flaticon.com/512/6596/6596121.png"]');
-      await expect(avatar).toBeVisible();
+    // Kiểm tra avatar hiển thị
+    const avatar = page.locator('img.h-10[src="https://cdn-icons-png.flaticon.com/512/6596/6596121.png"]');
+    await expect(avatar).toBeVisible();
 
-      // Kiểm tra nút đăng nhập trong dropdown menu bị ẩn (chỉ kiểm tra nút trong dropdown)
-      await loginPage.openUserMenu();
-      const dropdownLoginButton = page.locator('#user-dropdown button', { hasText: 'Đăng nhập' });
-      await expect(dropdownLoginButton).toBeHidden();
-    });
+    // Kiểm tra nút đăng nhập trong dropdown menu bị ẩn (chỉ kiểm tra nút trong dropdown)
+    await loginPage.openUserMenu();
+    const dropdownLoginButton = page.locator('#user-dropdown button', { hasText: 'Đăng nhập' });
+    await expect(dropdownLoginButton).toBeHidden();
   });
 });
 
@@ -163,6 +164,8 @@ test.describe('Login negative cases', () => {
     await loginPage.openLoginForm();
     const emailInput = page.locator('.ant-modal-content input[name="email"]');
     const passwordInput = page.locator('.ant-modal-content input[name="password"]');
+    console.log("process.env.MYAPP_USERNAME");
+    console.log(process.env.MYAPP_USERNAME);
     await emailInput.fill(process.env.MYAPP_USERNAME || 'user@example.com');
     await passwordInput.fill('tempPass');
     await passwordInput.fill('');

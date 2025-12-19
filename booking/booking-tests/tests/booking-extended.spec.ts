@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { HomePage } from '../pages/HomePage';
 import { RoomDetailPage } from '../pages/RoomDetailPage';
-
+import { BASE_URL } from "../utils/const"
 test.describe('Date Validation Tests', () => {
   test('Không cho chọn check-out trước check-in', async ({ page }) => {
     const homePage = new HomePage(page);
@@ -206,7 +206,7 @@ test.describe('Performance Tests', () => {
   test('Đo thời gian load trang chủ', async ({ page }) => {
     const startTime = Date.now();
     
-    await page.goto('https://demo4.cybersoft.edu.vn/');
+    await page.goto(BASE_URL);
     
     // Đợi element chính load xong
     await page.locator('text=Hồ Chí Minh').waitFor({ timeout: 30000 });
