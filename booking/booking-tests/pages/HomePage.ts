@@ -9,7 +9,7 @@ export class HomePage {
 
   // Vào trang chủ
   async goto() {
-    await this.page.goto("https://demo4.cybersoft.edu.vn/");
+    await this.page.goto("https://demo5.cybersoft.edu.vn/");
   }
 
   // Chọn city HCM	

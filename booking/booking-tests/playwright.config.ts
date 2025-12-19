@@ -1,7 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
+import path from 'path';
 
-dotenv.config();
+dotenv.config({
+  path: path.resolve(__dirname, '.env'),
+});
+
 
 export default defineConfig({
   timeout: 120000,
@@ -18,7 +22,7 @@ export default defineConfig({
 
   use: {
     headless: true,
-    baseURL: 'https://demo4.cybersoft.edu.vn/',
+    baseURL: 'https://demo5.cybersoft.edu.vn/',
     screenshot: 'on',
     video: 'on',
     trace: 'on-first-retry',

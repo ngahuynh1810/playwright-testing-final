@@ -13,7 +13,7 @@
     "test:advanced": "playwright test tests/advanced-tests.spec.ts",
     "test:comprehensive": "playwright test tests/comprehensive-tests.spec.ts",
     "report": "playwright show-report",
-    "codegen": "playwright codegen https://demo4.cybersoft.edu.vn/"
+    "codegen": "playwright codegen https://demo5.cybersoft.edu.vn/"
   },
   "keywords": [
     "playwright",
