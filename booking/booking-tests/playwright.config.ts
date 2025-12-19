@@ -1,9 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
-import { BASE_URL  } from "./utils/const"
-
-dotenv.config();
-
+import { BASE_URL } from "./utils/const"
+import path from 'path';
+// dotenv.config();
+dotenv.config({
+  path: path.resolve(__dirname, '.env'),
+});
 export default defineConfig({
   timeout: 120000, // 2 phút 
   testDir: './tests',
