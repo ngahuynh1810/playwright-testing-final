@@ -13,7 +13,7 @@ export class LoginPage {
     this.username = USERNAME || '';
     this.password = PASSWORD || '';
     // URL trang chủ mặc định, có thể thay đổi nếu cần
-    this.baseUrl = BASE_URL || 'https://demo5.cybersoft.edu.vn/';
+    this.baseUrl = BASE_URL;
   }
 
   // Hàm mở trang chủ (địa chỉ baseUrl)

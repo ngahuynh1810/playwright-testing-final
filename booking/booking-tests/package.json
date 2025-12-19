@@ -9,6 +9,7 @@
     "test:headed": "playwright test --headed",
     "test:login": "playwright test tests/login*.spec.ts",
     "test:booking": "playwright test tests/booking*.spec.ts",
+    "test:review": "playwright test tests/Review*.spec.ts",
     "test:extended": "playwright test tests/*-extended.spec.ts",
     "test:advanced": "playwright test tests/advanced-tests.spec.ts",
     "test:comprehensive": "playwright test tests/comprehensive-tests.spec.ts",

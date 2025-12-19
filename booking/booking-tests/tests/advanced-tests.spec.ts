@@ -2,12 +2,13 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import { HomePage } from '../pages/HomePage';
 import { RoomDetailPage } from '../pages/RoomDetailPage';
+import { BASE_URL } from "../utils/const"
 
 test.describe('API và Network Tests', () => {
   test('Kiểm tra thông tin phòng load từ API', async ({ page }) => {
     // Bắt request API
     const apiResponses: any[] = [];
-    
+
     page.on('response', async (response) => {
       if (response.url().includes('api') || response.url().includes('room')) {
         apiResponses.push({
@@ -24,7 +25,7 @@ test.describe('API và Network Tests', () => {
 
     // Đợi ít nhất 1 API call
     await page.waitForTimeout(3000);
-    
+
     // Log API calls để debug
     console.log('API calls captured:', apiResponses.length);
     apiResponses.forEach(resp => {
@@ -48,15 +49,15 @@ test.describe('API và Network Tests', () => {
 
     const homePage = new HomePage(page);
     await homePage.goto();
-    
+
     // Thử chọn HCM - có thể fail do API bị block
     try {
       await homePage.selectHCM();
-      
+
       // Kiểm tra có error message hay fallback UI
       const errorMsg = page.locator('text=/Error|Lỗi|Failed to load|Không thể tải/i');
       await expect.soft(errorMsg.first()).toBeVisible({ timeout: 10000 });
-      
+
     } catch (error) {
       console.log('Expected error due to blocked API:', error);
     }
@@ -74,7 +75,7 @@ test.describe('Cross-browser Compatibility', () => {
 
     const avatar = page.locator('img.h-10[src="https://cdn-icons-png.flaticon.com/512/6596/6596121.png"]');
     await expect(avatar).toBeVisible();
-    
+
     console.log(`Login successful on ${browserName}`);
   });
 
@@ -91,7 +92,7 @@ test.describe('Cross-browser Compatibility', () => {
     await loginPage.login();
 
     await roomDetail.openCalendar();
-    await roomDetail.selectCheckInAndCheckOut();
+    await roomDetail.fillCheckInAndCheckOutFuture();
     await roomDetail.closeCalendar();
     await roomDetail.addGuests(1);
     await roomDetail.clickBookNow();
@@ -99,7 +100,7 @@ test.describe('Cross-browser Compatibility', () => {
 
     const successMessage = page.locator("text=Thêm mới thành công");
     await expect(successMessage).toBeVisible({ timeout: 15000 });
-    
+
     console.log(`Booking successful on ${browserName}`);
   });
 });
@@ -118,20 +119,20 @@ test.describe('Security Tests', () => {
     // Kiểm tra value đã được escape/sanitize
     const emailValue = await emailInput.inputValue();
     expect(emailValue).not.toContain('<script>');
-    
+
     // Thử submit và kiểm tra không có popup
     await page.locator('.ant-modal-content button[type="submit"]').click();
-    
+
     // Kiểm tra page vẫn stable
     await page.waitForTimeout(2000);
     const currentUrl = page.url();
-    expect(currentUrl).toContain('demo4.cybersoft.edu.vn');
+    expect(currentUrl).toContain(BASE_URL);
   });
 
   test('SQL injection prevention trong login', async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.goto();
-    
+
     // Thử các SQL injection payloads
     const sqlPayloads = [
       "' OR '1'='1",
@@ -141,15 +142,15 @@ test.describe('Security Tests', () => {
 
     for (const payload of sqlPayloads) {
       await loginPage.loginWith(payload, 'anypassword');
-      
+
       // Không được đăng nhập thành công
       const avatar = page.locator('img.h-10[src="https://cdn-icons-png.flaticon.com/512/6596/6596121.png"]');
       await expect(avatar).not.toBeVisible();
-      
+
       // Modal vẫn mở (login failed)
       const modal = page.locator('.ant-modal-content');
       await expect(modal).toBeVisible();
-      
+
       console.log(`SQL injection payload blocked: ${payload}`);
     }
   });
@@ -163,14 +164,14 @@ test.describe('Accessibility Tests', () => {
     // Tab qua các elements chính
     await page.keyboard.press('Tab'); // Focus đầu tiên
     await page.keyboard.press('Tab'); // Chuyển sang element tiếp theo
-    
+
     // Kiểm tra focus visible
     const focusedElement = page.locator(':focus');
     await expect(focusedElement).toBeVisible();
-    
+
     // Enter để activate
     await page.keyboard.press('Enter');
-    
+
     // Kiểm tra có navigation xảy ra
     await page.waitForTimeout(2000);
   });
@@ -184,13 +185,13 @@ test.describe('Accessibility Tests', () => {
     // Kiểm tra các elements có ARIA labels
     const bookButton = page.getByRole("button", { name: "Đặt phòng" });
     await expect(bookButton).toBeVisible();
-    
+
     const plusButton = page.locator('button.bg-main >> text="+"');
     if (await plusButton.isVisible()) {
       // Kiểm tra có aria-label hoặc accessible name
       const ariaLabel = await plusButton.getAttribute('aria-label');
       const title = await plusButton.getAttribute('title');
-      
+
       expect(ariaLabel || title || '+').toBeTruthy();
     }
   });
@@ -204,7 +205,7 @@ test.describe('Accessibility Tests', () => {
     // Kiểm tra text có đủ contrast (đo bằng computed style)
     const priceText = page.locator('p.font-mono.text-lg.font-bold').first();
     await expect(priceText).toBeVisible();
-    
+
     const computedStyle = await priceText.evaluate(el => {
       const style = window.getComputedStyle(el);
       return {
@@ -213,9 +214,9 @@ test.describe('Accessibility Tests', () => {
         fontSize: style.fontSize
       };
     });
-    
+
     console.log('Price text styles:', computedStyle);
-    
+
     // Basic check: font size >= 14px
     const fontSize = parseInt(computedStyle.fontSize);
     expect(fontSize).toBeGreaterThanOrEqual(14);

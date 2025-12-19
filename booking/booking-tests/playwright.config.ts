@@ -1,14 +1,13 @@
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
+import { BASE_URL } from "./utils/const"
 import path from 'path';
-
+// dotenv.config();
 dotenv.config({
   path: path.resolve(__dirname, '.env'),
 });
-
-
 export default defineConfig({
-  timeout: 120000,
+  timeout: 120000, // 2 phút 
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
@@ -22,7 +21,7 @@ export default defineConfig({
 
   use: {
     headless: true,
-    baseURL: 'https://demo5.cybersoft.edu.vn/',
+    baseURL: BASE_URL,
     screenshot: 'on',
     video: 'on',
     trace: 'on-first-retry',
